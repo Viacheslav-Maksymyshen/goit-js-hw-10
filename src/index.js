@@ -4,16 +4,23 @@ import debounce from 'lodash.debounce';
 import Notiflix from 'notiflix';
 const DEBOUNCE_DELAY = 300;
 
+Notiflix.Notify.init({
+  timeout: 1000,
+});
+
 let refs = {
   input: document.querySelector('#search-box'),
   list: document.querySelector('.country-list'),
   info: document.querySelector('.country-info'),
 };
 
+const clearList = () => {
+  refs.list.innerHTML = '';
+  refs.info.innerHTML = '';
+};
 const importText = () => {
   if (refs.input.value === '') {
-    refs.list.innerHTML = '';
-    refs.info.innerHTML = '';
+    clearList();
     return;
   }
 
@@ -21,14 +28,12 @@ const importText = () => {
   fetchCountries(name)
     .then(data => {
       if (data.status === 404) {
-        refs.list.innerHTML = '';
-        refs.info.innerHTML = '';
+        clearList();
         Notiflix.Notify.failure('Oops, there is no country with that name');
         return;
       }
       if (data.length > 10) {
-        refs.list.innerHTML = '';
-        refs.info.innerHTML = '';
+        clearList();
         Notiflix.Notify.info(
           'Too many matches found. Please enter a more specific name.'
         );
@@ -65,7 +70,6 @@ const generateContentList = array => {
   const itemStyle = 'font-size: 30px; font-weight: 700';
 
   refs.info.setAttribute('style', 'font-size: 20px; font-weight: 400');
-
   refs.list.setAttribute(
     'style',
     `list-style-type: none; padding: 0; margin: 0; ${
